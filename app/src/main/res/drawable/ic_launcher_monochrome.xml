@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:width="44dp"
+        android:height="44dp"
+        android:gravity="center">
+        <vector
+            android:width="44dp"
+            android:height="44dp"
+            android:viewportWidth="512"
+            android:viewportHeight="512">
+            <!-- Shield outer boundary in pure black for Material You dynamic tinting -->
+            <path
+                android:fillColor="#000000"
+                android:pathData="M 476.64,194.53 C 476.64,416.94 304.48,479.01 264.31,490.46 C 258.88,492.00 253.13,492.00 247.70,490.46 C 207.53,479.01 35.36,416.94 35.36,194.53 C 35.36,161.65 38.51,137.02 41.39,121.35 C 43.59,109.42 52.68,99.98 64.49,97.23 C 151.35,76.97 212.42,43.42 239.81,26.22 C 249.72,20.00 262.30,20.00 272.20,26.22 C 299.59,43.42 360.66,76.97 447.51,97.22 C 459.32,99.98 468.41,109.42 470.61,121.35 C 473.49,137.02 476.64,161.65 476.64,194.53 Z" />
+        </vector>
+    </item>
+</layer-list>

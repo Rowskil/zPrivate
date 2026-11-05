@@ -1,0 +1,6 @@
+{
+  "name": "zPrivate VPN",
+  "description": "VPN haute vitesse avec chiffrement AES-256-GCM, Kill Switch automatique, tunnelisation fractionnée et transparence inspirée de VPN by Google.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

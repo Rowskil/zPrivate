@@ -1,0 +1,71 @@
+name: Build Android APK Release
+
+on:
+  push:
+    branches: [ "main", "master" ]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    name: Build and Release Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for Gradle wrapper
+        run: |
+          if [ -f "gradlew" ]; then
+            chmod +x gradlew
+          fi
+
+      - name: Prepare Local Environment & Placeholders
+        run: |
+          cp .env.example .env || true
+          touch local.properties
+
+      - name: Build Android Release & Debug APKs
+        run: |
+          gradle :app:assembleRelease :app:assembleDebug --no-daemon --stacktrace
+
+      - name: Verify Generated Artifacts
+        run: |
+          ls -la app/build/outputs/apk/release/ || true
+          ls -la app/build/outputs/apk/debug/ || true
+
+      - name: Upload APK Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: zPrivate-VPN-APKs
+          path: |
+            app/build/outputs/apk/release/*.apk
+            app/build/outputs/apk/debug/*.apk
+          retention-days: 14
+
+      - name: Create GitHub Release on Tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            app/build/outputs/apk/release/*.apk
+            app/build/outputs/apk/debug/*.apk
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

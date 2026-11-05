@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_widget_card"
+    android:orientation="vertical"
+    android:padding="14dp">
+
+    <!-- 1. Header: Branding, Status Badge, Ping Latency -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/ic_zprivate_logo" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="sans-serif-bold"
+                android:text="zPrivate"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/widget_status_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="● PROTÉGÉ"
+                android:textColor="#10B981"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/widget_latency_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_widget_server_box"
+            android:fontFamily="monospace"
+            android:paddingStart="8dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="3dp"
+            android:text="18 ms"
+            android:textColor="#10B981"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <!-- 2. Interactive Server Switcher (Center card) -->
+    <LinearLayout
+        android:id="@+id/widget_server_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_weight="1"
+        android:background="@drawable/bg_widget_server_box"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="6dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="6dp"
+        android:paddingBottom="6dp">
+
+        <!-- Previous Server Button (◀) -->
+        <TextView
+            android:id="@+id/widget_btn_prev_server"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/bg_widget_nav_btn"
+            android:gravity="center"
+            android:text="◀"
+            android:textColor="#3AA6DD"
+            android:textSize="14sp" />
+
+        <!-- Server & Throughput Info -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/widget_server_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-bold"
+                android:maxLines="1"
+                android:text="🇫🇷 Paris, France"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/widget_speed_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:maxLines="1"
+                android:text="⚡ 85.4 Mbps • WireGuard"
+                android:textColor="#3AA6DD"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- Next Server Button (▶) -->
+        <TextView
+            android:id="@+id/widget_btn_next_server"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/bg_widget_nav_btn"
+            android:gravity="center"
+            android:text="▶"
+            android:textColor="#3AA6DD"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- 3. Bottom Action: 1-Click Connection Toggle Button -->
+    <LinearLayout
+        android:id="@+id/widget_toggle_button"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:background="@drawable/bg_widget_btn_on"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/widget_toggle_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-bold"
+            android:text="ACTIF • PROTÉGÉ (1-CLIC)"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+</LinearLayout>

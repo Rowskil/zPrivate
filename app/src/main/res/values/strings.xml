@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">zPrivate VPN</string>
+    <string name="vpn_service_label">Tunnel chiffré zPrivate AES-256</string>
+    <string name="status_connected">Connexion protégée</string>
+    <string name="status_disconnected">Non protégé</string>
+    <string name="status_connecting">Chiffrement AES-256 en cours…</string>
+    <string name="status_killswitch_active">Kill Switch verrouillé — Trafic bloqué</string>
+    <string name="one_click_connect">Activer la protection en 1 clic</string>
+    <string name="one_click_disconnect">Désactiver le tunnel sécurisé</string>
+    <string name="kill_switch_title">Kill Switch automatique</string>
+    <string name="split_tunneling_title">Tunnelisation fractionnée</string>
+    <string name="transparency_title">Transparence &amp; Chiffrement AES-256</string>
+    <string name="servers_title">Serveurs mondiaux</string>
+    <string name="widget_description">Affiche le serveur actif, le débit réseau en temps réel et un bouton ON/OFF rapide.</string>
+    <string name="widget_toggle_desc">Activer ou désactiver le VPN</string>
+</resources>
