@@ -44,9 +44,32 @@ Le dépôt intègre deux flux automatisés dans `.github/workflows/` :
 
 ---
 
+## 🌐 Déploiement de la Passerelle Serveur Réelle (Relais NAT WireGuard)
+
+Pour que l'IP publique vue par les sites distants corresponde au pays du serveur choisi, déployez le script fourni dans le dossier `server/` sur votre VPS Ubuntu (ex: OVH, Hetzner, DigitalOcean, AWS) :
+
+```bash
+# 1. Rendre le script exécutable
+chmod +x server/deploy_wireguard_gateway.sh
+
+# 2. Lancer le déploiement automatisé
+sudo ./server/deploy_wireguard_gateway.sh
+```
+
+Ce script configure :
+- Le module noyau WireGuard (`wg-quick@wg0`).
+- L'activation de l'IP Forwarding (`sysctl net.ipv4.ip_forward=1`).
+- La règle de translation d'adresses réseau :
+  `iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o <eth0> -j MASQUERADE`.
+- La génération des clés cryptographiques serveur et client Android/iOS.
+- Une stack Docker Compose alternative (`server/docker-compose.yml`) pour déploiement en conteneur.
+
+---
+
 ## 🛠️ Signature Officielle
 
 - **Nom :** zPrivate VPN
 - **Version :** v1.0.0 (Build 1)
-- **Développé par :** zPrivate Labs
-- **Licence :** Propriétaire & Open-Security WireGuard
+- **Conçu par :** Anthony zaMer
+- **Protocole :** WireGuard® • AES-256-GCM
+

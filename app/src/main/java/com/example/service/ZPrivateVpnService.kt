@@ -120,14 +120,16 @@ class ZPrivateVpnService : VpnService() {
                 .addDnsServer("8.8.8.8")
                 .addDnsServer("1.0.0.1")
                 .addDnsServer("8.8.4.4")
-                .addRoute("10.8.0.0", 24) // Secure virtual private subnet
+                // Full Internet IPv4 Default Route: Directs 100% of outbound device traffic to the WireGuard NAT Gateway
+                .addRoute("0.0.0.0", 0)
                 .setBlocking(false)
 
-            // IPv6 support to prevent IPv6 blackholing in Happy Eyeballs apps (Pinterest, Google, Meta)
+            // IPv6 full route support to prevent IPv6 leaks and blackholing
             runCatching {
                 builder.addAddress("fd00:1:fd00:1::104", 128)
                 builder.addDnsServer("2606:4700:4700::1111")
                 builder.addDnsServer("2001:4860:4860::8888")
+                builder.addRoute("::", 0)
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
