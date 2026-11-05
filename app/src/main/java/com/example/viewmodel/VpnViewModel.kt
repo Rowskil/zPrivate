@@ -229,14 +229,15 @@ class VpnViewModel(application: Application) : AndroidViewModel(application) {
                 if (!rawSsid.isNullOrBlank() && rawSsid != "<unknown ssid>" && rawSsid != "0x") {
                     return rawSsid
                 }
-                // Try scanning network interfaces if SSID is masked
+
+                // Query network interface names or fall back to clean Wi-Fi label
                 val ni = java.net.NetworkInterface.getNetworkInterfaces()?.toList()?.firstOrNull {
-                    it.isUp && !it.isLoopback && (it.name.startsWith("wlan") || it.name.startsWith("eth"))
+                    it.isUp && !it.isLoopback && it.name.startsWith("wlan", ignoreCase = true)
                 }
                 if (ni != null && ni.displayName.isNotBlank() && !ni.displayName.equals("wlan0", ignoreCase = true)) {
                     return ni.displayName
                 }
-                return "Wi-Fi Connecté"
+                return "Wi-Fi (${detectWifiFrequency(wifiInfo)})"
             } else if (caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
                 val telephonyManager = getApplication<Application>()
                     .getSystemService(Context.TELEPHONY_SERVICE) as? android.telephony.TelephonyManager
@@ -248,12 +249,23 @@ class VpnViewModel(application: Application) : AndroidViewModel(application) {
                 if (!simOp.isNullOrBlank()) {
                     return simOp
                 }
-                return "Données Mobiles (4G/5G)"
+                return "Réseau Mobile (4G/5G)"
             } else if (caps.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
-                return "Connexion Ethernet"
+                return "Ethernet LAN"
             }
-            "Réseau Local Actif"
+            "Réseau Connecté"
         }.getOrDefault("Réseau Connecté")
+    }
+
+    private fun detectWifiFrequency(wifiInfo: WifiInfo?): String {
+        if (wifiInfo == null) return "Actif"
+        val freq = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) wifiInfo.frequency else 0
+        return when {
+            freq in 2400..2500 -> "2.4 GHz"
+            freq in 4900..5900 -> "5 GHz"
+            freq in 5925..7125 -> "6 GHz"
+            else -> "Actif"
+        }
     }
 
     private fun observePersistedPreferences() {

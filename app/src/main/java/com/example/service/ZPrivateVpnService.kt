@@ -120,16 +120,16 @@ class ZPrivateVpnService : VpnService() {
                 .addDnsServer("8.8.8.8")
                 .addDnsServer("1.0.0.1")
                 .addDnsServer("8.8.4.4")
-                // Full Internet IPv4 Default Route: Directs 100% of outbound device traffic to the WireGuard NAT Gateway
-                .addRoute("0.0.0.0", 0)
+                // Virtual subnet route for the encrypted private tunnel (10.8.0.0/24)
+                .addRoute("10.8.0.0", 24)
                 .setBlocking(false)
 
-            // IPv6 full route support to prevent IPv6 leaks and blackholing
+            // IPv6 virtual subnet route
             runCatching {
                 builder.addAddress("fd00:1:fd00:1::104", 128)
                 builder.addDnsServer("2606:4700:4700::1111")
                 builder.addDnsServer("2001:4860:4860::8888")
-                builder.addRoute("::", 0)
+                builder.addRoute("fd00:1:fd00:1::", 64)
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
