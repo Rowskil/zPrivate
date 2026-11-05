@@ -718,13 +718,13 @@ fun TransparencySecurityScreen(
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = "Conçu avec excellence par zPrivate Labs",
+                    text = "Conçu par Anthony zaMer",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = "WireGuard® • AES-256-GCM • Zéro-Log Certifié",
+                    text = "WireGuard® • AES-256-GCM",
                     style = MaterialTheme.typography.labelSmall,
                     color = accent,
                     fontWeight = FontWeight.Medium

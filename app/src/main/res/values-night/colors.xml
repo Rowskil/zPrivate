@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Adaptive Widget Colors (Dark Mode) -->
+    <color name="widget_card_bg">#FF101B2E</color>
+    <color name="widget_card_border">#FF2B4168</color>
+    <color name="widget_box_bg">#FF162238</color>
+    <color name="widget_box_border">#FF263A5E</color>
+    <color name="widget_nav_btn_bg">#FF21324E</color>
+    <color name="widget_title_color">#FFF8FAFC</color>
+</resources>

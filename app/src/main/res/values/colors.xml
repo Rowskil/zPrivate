@@ -7,4 +7,12 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Adaptive Widget Colors (Light Mode) -->
+    <color name="widget_card_bg">#FFFFFFFF</color>
+    <color name="widget_card_border">#FFCBD5E1</color>
+    <color name="widget_box_bg">#FFF1F5F9</color>
+    <color name="widget_box_border">#FFE2E8F0</color>
+    <color name="widget_nav_btn_bg">#FFE2E8F0</color>
+    <color name="widget_title_color">#FF0F172A</color>
 </resources>

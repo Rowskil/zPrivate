@@ -337,7 +337,13 @@ fun ZPrivateVpnApp(
                             onSelectSplitMode = { viewModel.setSplitTunnelMode(it) },
                             onToggleAppSelection = { viewModel.toggleAppSplitSelection(it) },
                             onSearchQueryChange = { viewModel.setAppSearchQuery(it) },
-                            onSelectCategory = { viewModel.setAppCategoryFilter(it) }
+                            onSelectCategory = { viewModel.setAppCategoryFilter(it) },
+                            onAddCustomApp = { name, pkg ->
+                                viewModel.addCustomAppToTunnels(name, pkg)
+                            },
+                            onRemoveApp = { pkg ->
+                                viewModel.removeAppFromTunnels(pkg)
+                            }
                         )
 
                         ZPrivateDestination.SETTINGS -> TransparencySecurityScreen(

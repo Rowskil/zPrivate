@@ -23,14 +23,20 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.CallSplit
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -40,7 +46,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -64,13 +75,19 @@ fun SplitTunnelingScreen(
     onToggleAppSelection: (String) -> Unit,
     onSearchQueryChange: (String) -> Unit,
     onSelectCategory: (String) -> Unit,
+    onAddCustomApp: (appName: String, packageOrPath: String) -> Unit = { _, _ -> },
+    onRemoveApp: (packageName: String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val lang = uiState.appLanguage
     val accent = MaterialTheme.colorScheme.primary
     val haptic = LocalHapticFeedback.current
+    var showAddAppDialog by remember { mutableStateOf(false) }
+    var customAppName by remember { mutableStateOf("") }
+    var customAppPackage by remember { mutableStateOf("") }
     val categories = listOf(
         "Toutes",
+        "Personnalisées",
         "Paiements",
         "Banques",
         "Streaming",
@@ -217,21 +234,55 @@ fun SplitTunnelingScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = when (lang) {
-                            AppLanguage.FR -> "Applications (${filteredApps.size})"
-                            AppLanguage.EN -> "Applications (${filteredApps.size})"
-                            AppLanguage.ES -> "Aplicaciones (${filteredApps.size})"
-                        },
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                    Text(
-                        text = "$selectedCount sélectionnées",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = accent
-                    )
+                    Column {
+                        Text(
+                            text = when (lang) {
+                                AppLanguage.FR -> "Applications (${filteredApps.size})"
+                                AppLanguage.EN -> "Applications (${filteredApps.size})"
+                                AppLanguage.ES -> "Aplicaciones (${filteredApps.size})"
+                            },
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        Text(
+                            text = "$selectedCount sélectionnées",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = accent
+                        )
+                    }
+
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = accent.copy(alpha = 0.16f),
+                        border = BorderStroke(1.dp, accent.copy(alpha = 0.45f)),
+                        modifier = Modifier
+                            .tactilePressScale()
+                            .clickable {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                showAddAppDialog = true
+                            }
+                            .testTag("btn_add_custom_app")
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = null,
+                                tint = accent,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "Ajouter",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = accent
+                            )
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -398,21 +449,101 @@ fun SplitTunnelingScreen(
                         }
                     }
 
-                    Switch(
-                        checked = app.isSelectedForSplit,
-                        onCheckedChange = {
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            onToggleAppSelection(app.packageName)
-                        },
-                        enabled = uiState.splitTunnelMode != SplitTunnelMode.ALL_APPS,
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = Color.White,
-                            checkedTrackColor = accent
-                        ),
-                        modifier = Modifier.testTag("split_switch_${app.packageName}")
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Switch(
+                            checked = app.isSelectedForSplit,
+                            onCheckedChange = {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                onToggleAppSelection(app.packageName)
+                            },
+                            enabled = uiState.splitTunnelMode != SplitTunnelMode.ALL_APPS,
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = Color.White,
+                                checkedTrackColor = accent
+                            ),
+                            modifier = Modifier.testTag("split_switch_${app.packageName}")
+                        )
+
+                        // Delete button for custom or non-core apps
+                        IconButton(
+                            onClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onRemoveApp(app.packageName)
+                            },
+                            modifier = Modifier
+                                .size(36.dp)
+                                .testTag("btn_remove_app_${app.packageName}")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Supprimer l'application",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    }
                 }
             }
         }
+    }
+
+    if (showAddAppDialog) {
+        AlertDialog(
+            onDismissRequest = { showAddAppDialog = false },
+            title = {
+                Text(
+                    text = "Ajouter une application",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column {
+                    Text(
+                        text = "Entrez le nom ou le package de l'application (ex: Spotify, com.spotify.music, Telegram, etc.) :",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    OutlinedTextField(
+                        value = customAppName,
+                        onValueChange = { customAppName = it },
+                        label = { Text("Nom de l'application") },
+                        placeholder = { Text("Ex: Telegram") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = customAppPackage,
+                        onValueChange = { customAppPackage = it },
+                        label = { Text("Nom du paquet (Package ID)") },
+                        placeholder = { Text("Ex: org.telegram.messenger") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (customAppPackage.isNotBlank()) {
+                            onAddCustomApp(customAppName, customAppPackage)
+                            customAppName = ""
+                            customAppPackage = ""
+                            showAddAppDialog = false
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = accent)
+                ) {
+                    Text("Ajouter au tunnel")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showAddAppDialog = false }) {
+                    Text("Annuler")
+                }
+            }
+        )
     }
 }

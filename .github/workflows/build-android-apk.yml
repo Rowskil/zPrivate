@@ -17,53 +17,50 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: Grant execute permission for Gradle wrapper
-        run: |
-          if [ -f "gradlew" ]; then
-            chmod +x gradlew
-          fi
-
-      - name: Prepare Local Environment & Placeholders
+      - name: Prepare Local Environment & Keys
         run: |
           cp .env.example .env || true
           touch local.properties
+          # Generate debug.keystore if not present so signing config never fails
+          if [ ! -f "debug.keystore" ]; then
+            keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          fi
+          # Ensure placeholder google-services.json is present if needed by GoogleServicesPlugin
+          if [ ! -f "app/google-services.json" ]; then
+            echo '{"project_info":{"project_number":"123456789","project_id":"zprivate-vpn"},"client":[{"client_info":{"mobilesdk_app_id":"1:123456789:android:abcdef","android_client_info":{"package_name":"com.aistudio.zprivatevpn.xkvqzp"}},"api_key":[{"current_key":"placeholder"}]}]}' > app/google-services.json
+          fi
 
-      - name: Build Android Release & Debug APKs
+      - name: Build Android Release APK
         run: |
-          gradle :app:assembleRelease :app:assembleDebug --no-daemon --stacktrace
+          gradle :app:assembleRelease --no-daemon --stacktrace
 
       - name: Verify Generated Artifacts
         run: |
           ls -la app/build/outputs/apk/release/ || true
-          ls -la app/build/outputs/apk/debug/ || true
 
       - name: Upload APK Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: zPrivate-VPN-APKs
-          path: |
-            app/build/outputs/apk/release/*.apk
-            app/build/outputs/apk/debug/*.apk
+          name: zPrivate-VPN-Release-APK
+          path: app/build/outputs/apk/release/*.apk
           retention-days: 14
 
       - name: Create GitHub Release on Tag
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            app/build/outputs/apk/release/*.apk
-            app/build/outputs/apk/debug/*.apk
+          files: app/build/outputs/apk/release/*.apk
           draft: false
           prerelease: false
           generate_release_notes: true

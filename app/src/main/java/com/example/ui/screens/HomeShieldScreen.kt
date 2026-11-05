@@ -1012,9 +1012,9 @@ private fun NetworkTransparencyCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = when (lang) {
-                            AppLanguage.FR -> "RÉSEAU DE L'APPAREIL"
-                            AppLanguage.EN -> "DEVICE NETWORK"
-                            AppLanguage.ES -> "RED DEL DISPOSITIVO"
+                            AppLanguage.FR -> "RÉSEAU"
+                            AppLanguage.EN -> "NETWORK"
+                            AppLanguage.ES -> "RED"
                         },
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant

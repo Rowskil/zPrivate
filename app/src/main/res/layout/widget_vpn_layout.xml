@@ -33,7 +33,7 @@
                 android:layout_marginStart="8dp"
                 android:fontFamily="sans-serif-bold"
                 android:text="zPrivate"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/widget_title_color"
                 android:textSize="14sp" />
 
             <TextView
@@ -86,7 +86,7 @@
             android:background="@drawable/bg_widget_nav_btn"
             android:gravity="center"
             android:text="◀"
-            android:textColor="#3AA6DD"
+            android:textColor="#6366F1"
             android:textSize="14sp" />
 
         <!-- Server & Throughput Info -->
@@ -107,7 +107,7 @@
                 android:fontFamily="sans-serif-bold"
                 android:maxLines="1"
                 android:text="🇫🇷 Paris, France"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/widget_title_color"
                 android:textSize="14sp" />
 
             <TextView
@@ -131,7 +131,7 @@
             android:background="@drawable/bg_widget_nav_btn"
             android:gravity="center"
             android:text="▶"
-            android:textColor="#3AA6DD"
+            android:textColor="#6366F1"
             android:textSize="14sp" />
     </LinearLayout>
 

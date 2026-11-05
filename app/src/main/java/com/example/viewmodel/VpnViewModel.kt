@@ -225,16 +225,35 @@ class VpnViewModel(application: Application) : AndroidViewModel(application) {
                 } else {
                     wifiManager?.connectionInfo
                 }
-                val ssid = wifiInfo?.ssid?.replace("\"", "")?.trim()
-                if (!ssid.isNullOrEmpty() && ssid != "<unknown ssid>") {
-                    return ssid
+                val rawSsid = wifiInfo?.ssid?.replace("\"", "")?.trim()
+                if (!rawSsid.isNullOrBlank() && rawSsid != "<unknown ssid>" && rawSsid != "0x") {
+                    return rawSsid
                 }
-                return "Réseau Wi-Fi privé"
+                // Try scanning network interfaces if SSID is masked
+                val ni = java.net.NetworkInterface.getNetworkInterfaces()?.toList()?.firstOrNull {
+                    it.isUp && !it.isLoopback && (it.name.startsWith("wlan") || it.name.startsWith("eth"))
+                }
+                if (ni != null && ni.displayName.isNotBlank() && !ni.displayName.equals("wlan0", ignoreCase = true)) {
+                    return ni.displayName
+                }
+                return "Wi-Fi Connecté"
             } else if (caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                return "Opérateur Mobile"
+                val telephonyManager = getApplication<Application>()
+                    .getSystemService(Context.TELEPHONY_SERVICE) as? android.telephony.TelephonyManager
+                val opName = telephonyManager?.networkOperatorName?.trim()
+                if (!opName.isNullOrBlank()) {
+                    return opName
+                }
+                val simOp = telephonyManager?.simOperatorName?.trim()
+                if (!simOp.isNullOrBlank()) {
+                    return simOp
+                }
+                return "Données Mobiles (4G/5G)"
+            } else if (caps.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+                return "Connexion Ethernet"
             }
-            "Réseau sécurisé"
-        }.getOrDefault("Réseau Wi-Fi")
+            "Réseau Local Actif"
+        }.getOrDefault("Réseau Connecté")
     }
 
     private fun observePersistedPreferences() {
@@ -579,6 +598,50 @@ class VpnViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setAppCategoryFilter(category: String) {
         _uiState.update { it.copy(selectedAppCategory = category) }
+    }
+
+    fun addCustomAppToTunnels(appName: String, rawPackageOrPath: String) {
+        viewModelScope.launch {
+            val cleanPkg = rawPackageOrPath.trim().lowercase().replace(" ", "")
+            val cleanName = appName.trim().ifBlank { cleanPkg }
+            if (cleanPkg.isBlank()) return@launch
+
+            val currentList = _uiState.value.appRoutingList
+            if (currentList.any { it.packageName.equals(cleanPkg, ignoreCase = true) }) {
+                return@launch
+            }
+
+            val newItem = AppRoutingItem(
+                packageName = cleanPkg,
+                appName = cleanName,
+                category = "Personnalisées",
+                isSystemOrInstalled = true,
+                isSelectedForSplit = true
+            )
+            val updatedList = listOf(newItem) + currentList
+            _uiState.update { it.copy(appRoutingList = updatedList) }
+
+            val selectedSet = updatedList.filter { it.isSelectedForSplit }.map { it.packageName }.toSet()
+            repository.updateSplitPackages(selectedSet)
+
+            if (_uiState.value.connectionState == VpnConnectionState.CONNECTED) {
+                startPlatformVpnService(_uiState.value.selectedServer)
+            }
+        }
+    }
+
+    fun removeAppFromTunnels(packageName: String) {
+        viewModelScope.launch {
+            val updatedList = _uiState.value.appRoutingList.filterNot { it.packageName == packageName }
+            _uiState.update { it.copy(appRoutingList = updatedList) }
+
+            val selectedSet = updatedList.filter { it.isSelectedForSplit }.map { it.packageName }.toSet()
+            repository.updateSplitPackages(selectedSet)
+
+            if (_uiState.value.connectionState == VpnConnectionState.CONNECTED) {
+                startPlatformVpnService(_uiState.value.selectedServer)
+            }
+        }
     }
 
     fun setProtocol(protocol: VpnProtocol) {
