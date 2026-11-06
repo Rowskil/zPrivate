@@ -14,10 +14,10 @@ echo "=========================================================="
 echo "🛡️  Deploying zPrivate Multi-Hop WireGuard Gateway (OVH)"
 echo "=========================================================="
 
-# 1. Update OS and Install WireGuard, iptables, iproute2, qrencode
+# 1. Update OS and Install WireGuard Tools, iptables, iproute2, qrencode
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
-apt-get install -y wireguard iptables iptables-persistent iproute2 qrencode curl ufw
+apt-get install -y wireguard wireguard-tools iptables iproute2 qrencode curl ufw
 
 # 2. Detect Public IP and Primary Network Interface
 MAIN_INTERFACE=$(ip -4 route ls | grep default | awk -F "dev " '{print $2}' | awk '{print $1}' | head -n 1)

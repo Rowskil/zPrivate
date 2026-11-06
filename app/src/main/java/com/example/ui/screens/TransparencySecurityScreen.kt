@@ -75,15 +75,12 @@ fun TransparencySecurityScreen(
     onUpdateAppearance: (AppThemePreference, AppAccentColor) -> Unit,
     onUpdateLanguage: (AppLanguage) -> Unit,
     onCheckForUpdates: () -> Unit = {},
-    onUpdateMasterGatewayIp: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val lang = uiState.appLanguage
     val accent = MaterialTheme.colorScheme.primary
     val haptic = LocalHapticFeedback.current
     var languageMenuExpanded by remember { mutableStateOf(false) }
-    var showGatewayIpDialog by remember { mutableStateOf(false) }
-    var gatewayIpInput by remember(uiState.masterGatewayIp) { mutableStateOf(uiState.masterGatewayIp) }
 
     LazyColumn(
         modifier = modifier
@@ -631,178 +628,7 @@ fun TransparencySecurityScreen(
             }
         }
 
-        // 4. Section Passerelle Réelle & Déploiement Relais NAT (Option 3: Chaînage Multi-Hop OVH)
-        item {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .widthIn(max = 600.dp),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                border = BorderStroke(1.dp, ProtectedEmerald.copy(alpha = 0.45f))
-            ) {
-                Column(modifier = Modifier.padding(18.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Surface(
-                                shape = CircleShape,
-                                color = ProtectedEmerald.copy(alpha = 0.16f),
-                                modifier = Modifier.size(38.dp)
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Icon(
-                                        imageVector = Icons.Default.Dns,
-                                        contentDescription = null,
-                                        tint = ProtectedEmerald,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                }
-                            }
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Text(
-                                    text = "Passerelle Relais NAT Dédiée",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Text(
-                                    text = "Hub Maître OVH • Chaînage Multi-Hop (UDP 51820–51837)",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-
-                        Surface(
-                            shape = RoundedCornerShape(10.dp),
-                            color = ProtectedEmerald.copy(alpha = 0.15f),
-                            border = BorderStroke(1.dp, ProtectedEmerald.copy(alpha = 0.35f))
-                        ) {
-                            Text(
-                                text = "Multi-Hop",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = ProtectedEmerald,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = "Architecture Chaînage Multi-Hop : votre VPS unique OVH (Gravelines) écoute sur les ports UDP 51820 à 51837. Le port 51820 sort directement en France, et les ports 51821–51837 routent chaque sous-réseau pays (10.8.X.0/24) vers son tunnel de sortie international dédié.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.background,
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = "VPS OVH ACTIF • vps-e379a1a0.vps.ovh.net",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Spacer(modifier = Modifier.height(2.dp))
-                                Text(
-                                    text = if (uiState.masterGatewayIp.isNotBlank()) {
-                                        "${uiState.masterGatewayIp}:${uiState.selectedServer.relayPort}"
-                                    } else {
-                                        "213.32.22.5:${uiState.selectedServer.relayPort}"
-                                    },
-                                    style = MaterialTheme.typography.labelMedium,
-                                    fontFamily = com.example.ui.theme.JetBrainsMono,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Text(
-                                    text = "IPv6 : 2001:41d0:305:2100::ada5 • Tunnel 10.8.${uiState.selectedServer.tunnelSubnetIndex}.104",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = accent
-                                )
-                            }
-
-                            Surface(
-                                shape = RoundedCornerShape(10.dp),
-                                color = accent.copy(alpha = 0.16f),
-                                border = BorderStroke(1.dp, accent.copy(alpha = 0.4f)),
-                                modifier = Modifier
-                                    .tactilePressScale()
-                                    .clickable {
-                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                        gatewayIpInput = uiState.masterGatewayIp
-                                        showGatewayIpDialog = true
-                                    }
-                                    .testTag("btn_configure_ovh_ip")
-                            ) {
-                                Text(
-                                    text = "Configurer IP",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = accent,
-                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-                                )
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.background,
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(modifier = Modifier.padding(12.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Default.Terminal,
-                                    contentDescription = null,
-                                    tint = accent,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = "Commandes de déploiement VPS Ubuntu 24.04 :",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "sudo bash server/deploy_wireguard_gateway.sh\nsudo bash server/attach_upstream_exits.sh",
-                                style = MaterialTheme.typography.labelSmall,
-                                fontFamily = com.example.ui.theme.JetBrainsMono,
-                                color = accent
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        // 5. Section Mises à jour GitHub & Distribution
+        // 4. Section Mises à jour GitHub & Distribution
         item {
             Card(
                 modifier = Modifier
@@ -907,61 +733,6 @@ fun TransparencySecurityScreen(
                 )
             }
         }
-    }
-
-    if (showGatewayIpDialog) {
-        androidx.compose.material3.AlertDialog(
-            onDismissRequest = { showGatewayIpDialog = false },
-            title = {
-                Text(
-                    text = "IP du VPS Maître OVH (Gravelines)",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            text = {
-                Column {
-                    Text(
-                        text = "Entrez l'adresse IPv4 publique reçue pour votre VPS OVHcloud (Ubuntu 24.04). Tous les serveurs (ports UDP 51820–51837) utiliseront automatiquement ce Hub :",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    androidx.compose.material3.OutlinedTextField(
-                        value = gatewayIpInput,
-                        onValueChange = { gatewayIpInput = it },
-                        singleLine = true,
-                        label = { Text("Adresse IPv4 ou Hôte (ex: 51.210.42.18)") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag("input_ovh_gateway_ip")
-                    )
-                }
-            },
-            confirmButton = {
-                androidx.compose.material3.Button(
-                    onClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onUpdateMasterGatewayIp(gatewayIpInput.trim())
-                        showGatewayIpDialog = false
-                    },
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                        containerColor = accent,
-                        contentColor = Color.White
-                    ),
-                    modifier = Modifier.testTag("btn_save_ovh_gateway_ip")
-                ) {
-                    Text("Enregistrer")
-                }
-            },
-            dismissButton = {
-                androidx.compose.material3.TextButton(
-                    onClick = { showGatewayIpDialog = false }
-                ) {
-                    Text("Annuler")
-                }
-            }
-        )
     }
 }
 

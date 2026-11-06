@@ -363,9 +363,6 @@ fun ZPrivateVpnApp(
                             },
                             onCheckForUpdates = {
                                 viewModel.checkForUpdates(silent = false)
-                            },
-                            onUpdateMasterGatewayIp = { ip ->
-                                viewModel.setMasterGatewayIp(ip)
                             }
                         )
                     }

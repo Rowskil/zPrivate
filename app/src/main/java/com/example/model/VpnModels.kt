@@ -219,6 +219,8 @@ object GlobalServersCatalog {
     const val OVH_MASTER_IPV4 = "213.32.22.5"
     const val OVH_MASTER_IPV6 = "2001:41d0:305:2100::ada5"
     const val OVH_MASTER_HOSTNAME = "vps-e379a1a0.vps.ovh.net"
+    const val OVH_SERVER_PUBLIC_KEY = "FYAMLKeeWfVk+p5sLFXKlZvHWdWa8DQDskqgepNiTWE="
+    const val OVH_CLIENT_PUBLIC_KEY = "kHDyi7lLEXzJhFhqoBrrSvCI7qLIUMPLKbzxpSZdKmA="
 
     val servers = listOf(
         VpnServer(
