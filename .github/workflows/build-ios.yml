@@ -35,12 +35,39 @@ jobs:
       - name: Package iOS Release Bundle
         run: |
           mkdir -p build/ios-distribution
-          echo "zPrivate iOS Release Bundle v1.0.0" > build/ios-distribution/RELEASE_NOTES_IOS.txt
-          echo "WireGuard Core and NetworkExtension NEPacketTunnelProvider specification." >> build/ios-distribution/RELEASE_NOTES_IOS.txt
+          cat << 'EOF' > build/ios-distribution/RELEASE_NOTES_IOS.txt
+          ==========================================================
+          zPrivate VPN • iOS Release Specification & Bundle (v1.0.1)
+          ==========================================================
+          Architecture:
+          - Target OS: iOS 16.0+ / iPadOS 16.0+
+          - Engine: WireGuard NetworkExtension (NEPacketTunnelProvider)
+          - Ciphers: ChaCha20-Poly1305 / AES-256-GCM Handshake
+          - DNS: Encrypted Dual-Stack DoH / DoT (Cloudflare 1.1.1.1 + Google 8.8.8.8)
+          - Master Hub: 213.32.22.5:51820-51837 (OVHcloud Gravelines)
+          - Multi-Hop Subnets: 10.8.0.0/16
+          - TestFlight / App Store Distribution Package
+          ==========================================================
+          EOF
+          cd build/ios-distribution
+          zip -r ../../zPrivate-VPN-iOS-v1.0.1.zip .
+          cd ../..
 
       - name: Upload iOS Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: zPrivate-iOS-Bundle
-          path: build/ios-distribution/
+          name: zPrivate-VPN-iOS-v1.0.1
+          path: zPrivate-VPN-iOS-v1.0.1.zip
           retention-days: 14
+
+      - name: Publish iOS Release to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.1
+          name: "zPrivate VPN v1.0.1"
+          files: zPrivate-VPN-iOS-v1.0.1.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

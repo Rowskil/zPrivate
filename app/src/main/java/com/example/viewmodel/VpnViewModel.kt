@@ -713,14 +713,14 @@ class VpnViewModel(application: Application) : AndroidViewModel(application) {
                 val connection = (url.openConnection() as java.net.HttpURLConnection).apply {
                     connectTimeout = 6000
                     readTimeout = 6000
-                    setRequestProperty("User-Agent", "zPrivate-VPN-Android/1.0.0")
+                    setRequestProperty("User-Agent", "zPrivate-VPN-Android/1.0.1")
                     setRequestProperty("Accept", "application/vnd.github.v3+json")
                 }
 
                 if (connection.responseCode == 200) {
                     val body = connection.inputStream.bufferedReader().use { it.readText() }
                     val json = org.json.JSONObject(body)
-                    val tagName = json.optString("tag_name", "v1.0.0")
+                    val tagName = json.optString("tag_name", "v1.0.1")
                     val releaseName = json.optString("name", "zPrivate VPN $tagName")
                     val bodyNotes = json.optString("body", "Mise à jour de performance et sécurité WireGuard.")
                     val htmlUrl = json.optString("html_url", "https://github.com/Rowskil/zPrivate/releases")
@@ -738,7 +738,7 @@ class VpnViewModel(application: Application) : AndroidViewModel(application) {
                         }
                     }
 
-                    val isNewer = isVersionNewer(tagName, "v1.0.0")
+                    val isNewer = isVersionNewer(tagName, "v1.0.1")
                     withContext(Dispatchers.Main) {
                         if (isNewer) {
                             _uiState.update {
@@ -758,7 +758,7 @@ class VpnViewModel(application: Application) : AndroidViewModel(application) {
                             _uiState.update {
                                 it.copy(
                                     isCheckingForUpdate = false,
-                                    updateCheckMessage = if (!silent) "Vous disposez de la version la plus récente (v1.0.0)." else null
+                                    updateCheckMessage = if (!silent) "Vous disposez de la version la plus récente (v1.0.1)." else null
                                 )
                             }
                         }

@@ -713,7 +713,7 @@ fun TransparencySecurityScreen(
                 ZPrivateLogoVector(size = 32.dp)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "zPrivate VPN • v1.0.0 (Build 1)",
+                    text = "zPrivate VPN • v1.0.1 (Build 2)",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
