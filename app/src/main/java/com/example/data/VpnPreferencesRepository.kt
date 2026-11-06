@@ -25,7 +25,7 @@ data class PersistedVpnSettings(
     val strictLockdownEnabled: Boolean = false,
     val dnsLeakProtection: Boolean = true,
     val ipv6LeakProtection: Boolean = true,
-    val multiHopEnabled: Boolean = false,
+    val multiHopEnabled: Boolean = true,
     val splitTunnelMode: SplitTunnelMode = SplitTunnelMode.BYPASS_SELECTED,
     val splitSelectedPackages: Set<String> = setOf(
         "com.paypal.android.p2pmobile",
@@ -35,7 +35,8 @@ data class PersistedVpnSettings(
     val protocol: VpnProtocol = VpnProtocol.WIREGUARD_AES256,
     val themePreference: AppThemePreference = AppThemePreference.SYSTEM,
     val accentColor: AppAccentColor = AppAccentColor.ROYAL_INDIGO,
-    val appLanguage: AppLanguage = AppLanguage.FR
+    val appLanguage: AppLanguage = AppLanguage.FR,
+    val masterGatewayIp: String = "213.32.22.5"
 )
 
 class VpnPreferencesRepository(private val context: Context) {
@@ -54,6 +55,7 @@ class VpnPreferencesRepository(private val context: Context) {
         val THEME_PREFERENCE = stringPreferencesKey("theme_preference")
         val ACCENT_COLOR = stringPreferencesKey("accent_color")
         val APP_LANGUAGE = stringPreferencesKey("app_language")
+        val MASTER_GATEWAY_IP = stringPreferencesKey("master_gateway_ip")
     }
 
     val settingsFlow: Flow<PersistedVpnSettings> = context.dataStore.data.map { prefs ->
@@ -64,7 +66,7 @@ class VpnPreferencesRepository(private val context: Context) {
             strictLockdownEnabled = prefs[Keys.STRICT_LOCKDOWN] ?: false,
             dnsLeakProtection = prefs[Keys.DNS_LEAK_PROTECTION] ?: true,
             ipv6LeakProtection = prefs[Keys.IPV6_LEAK_PROTECTION] ?: true,
-            multiHopEnabled = prefs[Keys.MULTI_HOP] ?: false,
+            multiHopEnabled = prefs[Keys.MULTI_HOP] ?: true,
             splitTunnelMode = prefs[Keys.SPLIT_MODE]?.let {
                 runCatching { SplitTunnelMode.valueOf(it) }.getOrNull()
             } ?: SplitTunnelMode.BYPASS_SELECTED,
@@ -84,7 +86,8 @@ class VpnPreferencesRepository(private val context: Context) {
             } ?: AppAccentColor.ROYAL_INDIGO,
             appLanguage = prefs[Keys.APP_LANGUAGE]?.let {
                 runCatching { AppLanguage.valueOf(it) }.getOrNull()
-            } ?: AppLanguage.FR
+            } ?: AppLanguage.FR,
+            masterGatewayIp = prefs[Keys.MASTER_GATEWAY_IP]?.ifBlank { "213.32.22.5" } ?: "213.32.22.5"
         )
     }
 
@@ -141,6 +144,12 @@ class VpnPreferencesRepository(private val context: Context) {
     suspend fun updateLanguage(language: AppLanguage) {
         context.dataStore.edit { prefs ->
             prefs[Keys.APP_LANGUAGE] = language.name
+        }
+    }
+
+    suspend fun updateMasterGatewayIp(ip: String) {
+        context.dataStore.edit { prefs ->
+            prefs[Keys.MASTER_GATEWAY_IP] = ip.trim()
         }
     }
 }

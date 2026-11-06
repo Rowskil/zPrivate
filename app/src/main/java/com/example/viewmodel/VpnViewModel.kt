@@ -74,13 +74,14 @@ data class VpnUiState(
     val uploadHistoryMbps: List<Float> = List(24) { 0f },
     val totalSessionDownloadMb: Float = 0f,
     val totalSessionUploadMb: Float = 0f,
-    val maskedVirtualIp: String = "10.8.0.104",
+    val maskedVirtualIp: String = "213.32.22.5",
     val connectedNetworkName: String = "Réseau Local",
     val connectedNetworkType: String = "Wi-Fi",
     val isDeviceOnline: Boolean = true,
     val availableUpdate: GitHubReleaseInfo? = null,
     val isCheckingForUpdate: Boolean = false,
-    val updateCheckMessage: String? = null
+    val updateCheckMessage: String? = null,
+    val masterGatewayIp: String = "213.32.22.5"
 )
 
 class VpnViewModel(application: Application) : AndroidViewModel(application) {
@@ -156,7 +157,7 @@ class VpnViewModel(application: Application) : AndroidViewModel(application) {
                 state.copy(
                     connectionState = VpnConnectionState.CONNECTED,
                     selectedServer = srv,
-                    maskedVirtualIp = "${srv.virtualIpPrefix}.104"
+                    maskedVirtualIp = if (srv.id == "fr-par-01") "213.32.22.5" else "${srv.virtualIpPrefix}.104"
                 )
             }
             if (telemetryJob?.isActive != true) {
@@ -292,7 +293,8 @@ class VpnViewModel(application: Application) : AndroidViewModel(application) {
                         themePreference = prefs.themePreference,
                         accentColor = prefs.accentColor,
                         appLanguage = prefs.appLanguage,
-                        maskedVirtualIp = "${matchedServer.virtualIpPrefix}.104"
+                        maskedVirtualIp = if (matchedServer.id == "fr-par-01") "213.32.22.5" else "${matchedServer.virtualIpPrefix}.104",
+                        masterGatewayIp = prefs.masterGatewayIp
                     )
                 }
             }
@@ -403,7 +405,7 @@ class VpnViewModel(application: Application) : AndroidViewModel(application) {
             _uiState.update { state ->
                 state.copy(
                     connectionState = VpnConnectionState.CONNECTED,
-                    maskedVirtualIp = "${serverToUse.virtualIpPrefix}.104",
+                    maskedVirtualIp = if (serverToUse.id == "fr-par-01") "213.32.22.5" else "${serverToUse.virtualIpPrefix}.104",
                     connectedDurationSeconds = 0L
                 )
             }
@@ -440,6 +442,8 @@ class VpnViewModel(application: Application) : AndroidViewModel(application) {
                 putExtra(ZPrivateVpnService.EXTRA_SERVER_CITY, server.city)
                 putExtra(ZPrivateVpnService.EXTRA_SERVER_COUNTRY, server.country)
                 putExtra(ZPrivateVpnService.EXTRA_VIRTUAL_IP, state.maskedVirtualIp)
+                putExtra(ZPrivateVpnService.EXTRA_SUBNET_INDEX, server.tunnelSubnetIndex)
+                putExtra(ZPrivateVpnService.EXTRA_RELAY_PORT, server.relayPort)
                 putExtra(ZPrivateVpnService.EXTRA_MTU, state.protocol.mtu)
                 putExtra(ZPrivateVpnService.EXTRA_KILL_SWITCH, state.killSwitchEnabled)
                 putExtra(ZPrivateVpnService.EXTRA_SPLIT_MODE, state.splitTunnelMode.ordinal)
@@ -686,6 +690,17 @@ class VpnViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun setMasterGatewayIp(ip: String) {
+        viewModelScope.launch {
+            val cleaned = ip.trim()
+            repository.updateMasterGatewayIp(cleaned)
+            _uiState.update { it.copy(masterGatewayIp = cleaned) }
+            if (_uiState.value.connectionState == VpnConnectionState.CONNECTED) {
+                connectVpn(_uiState.value.selectedServer)
+            }
+        }
+    }
+
     fun dismissUpdateDialog() {
         _uiState.update { it.copy(availableUpdate = null, updateCheckMessage = null) }
     }
@@ -694,7 +709,7 @@ class VpnViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isCheckingForUpdate = true, updateCheckMessage = null) }
             try {
-                val url = java.net.URL("https://api.github.com/repos/zamerkitty/zPrivate/releases/latest")
+                val url = java.net.URL("https://api.github.com/repos/Rowskil/zPrivate/releases/latest")
                 val connection = (url.openConnection() as java.net.HttpURLConnection).apply {
                     connectTimeout = 6000
                     readTimeout = 6000
@@ -708,7 +723,7 @@ class VpnViewModel(application: Application) : AndroidViewModel(application) {
                     val tagName = json.optString("tag_name", "v1.0.0")
                     val releaseName = json.optString("name", "zPrivate VPN $tagName")
                     val bodyNotes = json.optString("body", "Mise à jour de performance et sécurité WireGuard.")
-                    val htmlUrl = json.optString("html_url", "https://github.com/zamerkitty/zPrivate/releases")
+                    val htmlUrl = json.optString("html_url", "https://github.com/Rowskil/zPrivate/releases")
 
                     var downloadUrl = htmlUrl
                     val assets = json.optJSONArray("assets")

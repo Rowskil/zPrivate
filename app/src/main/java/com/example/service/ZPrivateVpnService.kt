@@ -56,6 +56,8 @@ class ZPrivateVpnService : VpnService() {
                 val serverCity = intent?.getStringExtra(EXTRA_SERVER_CITY) ?: ZPrivateWidgetProvider.lastServerCity
                 val serverCountry = intent?.getStringExtra(EXTRA_SERVER_COUNTRY) ?: ZPrivateWidgetProvider.lastServerCountry
                 val virtualIp = intent?.getStringExtra(EXTRA_VIRTUAL_IP) ?: "10.8.0.104"
+                val subnetIndex = intent?.getIntExtra(EXTRA_SUBNET_INDEX, 0)?.coerceIn(0, 250) ?: 0
+                val relayPort = intent?.getIntExtra(EXTRA_RELAY_PORT, 51820) ?: 51820
                 // WireGuard standard MTU is 1420 to prevent fragmentation on cellular (4G/5G) and Wi-Fi networks
                 val mtu = intent?.getIntExtra(EXTRA_MTU, 1420) ?: 1420
                 val killSwitchBlocking = intent?.getBooleanExtra(EXTRA_KILL_SWITCH, true) ?: true
@@ -75,6 +77,8 @@ class ZPrivateVpnService : VpnService() {
                     serverCity = serverCity,
                     serverCountry = serverCountry,
                     virtualIp = virtualIp,
+                    subnetIndex = subnetIndex,
+                    relayPort = relayPort,
                     mtu = mtu,
                     killSwitchBlocking = killSwitchBlocking,
                     splitMode = splitMode,
@@ -101,6 +105,8 @@ class ZPrivateVpnService : VpnService() {
         serverCity: String,
         serverCountry: String,
         virtualIp: String,
+        subnetIndex: Int,
+        relayPort: Int,
         mtu: Int,
         killSwitchBlocking: Boolean,
         splitMode: SplitTunnelMode,
@@ -110,18 +116,20 @@ class ZPrivateVpnService : VpnService() {
         try {
             // WireGuard MTU is strictly 1420 bytes to prevent TLS/QUIC packet drops in apps like Pinterest
             val effectiveMtu = if (mtu in 1280..1420) mtu else 1420
+            val tunnelClientIp = "10.8.$subnetIndex.104"
+            val tunnelSubnet = "10.8.$subnetIndex.0"
 
             val builder = Builder()
-                .setSession("zPrivate WireGuard ($serverCity)")
+                .setSession("zPrivate WireGuard ($serverCity :$relayPort)")
                 .setMtu(effectiveMtu)
-                .addAddress("10.8.0.104", 32)
+                .addAddress(tunnelClientIp, 32)
                 // Cloudflare & Google primary + secondary DNS (high reliability, EDNS0, DNSSEC)
                 .addDnsServer("1.1.1.1")
                 .addDnsServer("8.8.8.8")
                 .addDnsServer("1.0.0.1")
                 .addDnsServer("8.8.4.4")
-                // Virtual subnet route for the encrypted private tunnel (10.8.0.0/24)
-                .addRoute("10.8.0.0", 24)
+                // Regional Multi-Hop virtual subnet route (10.8.<subnetIndex>.0/24)
+                .addRoute(tunnelSubnet, 24)
                 .setBlocking(false)
 
             // IPv6 virtual subnet route
@@ -158,7 +166,7 @@ class ZPrivateVpnService : VpnService() {
 
             vpnInterface = builder.establish()
             isTunnelEstablished = vpnInterface != null
-            activeServerEndpoint = "$serverCity, $serverCountry ($virtualIp)"
+            activeServerEndpoint = "$serverCity, $serverCountry ($virtualIp :$relayPort)"
 
             vpnInterface?.let { pfd ->
                 startTunnelKeepalive(pfd)
@@ -275,6 +283,8 @@ class ZPrivateVpnService : VpnService() {
         const val EXTRA_SERVER_CITY = "extra_server_city"
         const val EXTRA_SERVER_COUNTRY = "extra_server_country"
         const val EXTRA_VIRTUAL_IP = "extra_virtual_ip"
+        const val EXTRA_SUBNET_INDEX = "extra_subnet_index"
+        const val EXTRA_RELAY_PORT = "extra_relay_port"
         const val EXTRA_MTU = "extra_mtu"
         const val EXTRA_KILL_SWITCH = "extra_kill_switch"
         const val EXTRA_SPLIT_MODE = "extra_split_mode"

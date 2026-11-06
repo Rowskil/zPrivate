@@ -190,6 +190,8 @@ data class VpnServer(
     val region: ServerRegion,
     val virtualIpPrefix: String,
     val endpointHost: String,
+    val relayPort: Int = 51820,
+    val tunnelSubnetIndex: Int = 0,
     val baseLatencyMs: Int,
     val measuredLatencyMs: Int = baseLatencyMs,
     val loadPercent: Int,
@@ -214,18 +216,24 @@ data class AppRoutingItem(
 )
 
 object GlobalServersCatalog {
+    const val OVH_MASTER_IPV4 = "213.32.22.5"
+    const val OVH_MASTER_IPV6 = "2001:41d0:305:2100::ada5"
+    const val OVH_MASTER_HOSTNAME = "vps-e379a1a0.vps.ovh.net"
+
     val servers = listOf(
         VpnServer(
             id = "fr-par-01",
-            city = "Paris",
+            city = "Gravelines / Paris",
             country = "France",
             countryCode = "FR",
             flagEmoji = "🇫🇷",
             region = ServerRegion.EUROPE,
-            virtualIpPrefix = "185.212.148",
-            endpointHost = "par01.edge.zprivate.net",
+            virtualIpPrefix = "213.32.22",
+            endpointHost = OVH_MASTER_IPV4,
+            relayPort = 51820,
+            tunnelSubnetIndex = 0,
             baseLatencyMs = 11,
-            loadPercent = 24,
+            loadPercent = 12,
             bandwidthGbps = 40
         ),
         VpnServer(
@@ -236,7 +244,9 @@ object GlobalServersCatalog {
             flagEmoji = "🇨🇲",
             region = ServerRegion.MEA,
             virtualIpPrefix = "154.72.168",
-            endpointHost = "dla01.africa.zprivate.net",
+            endpointHost = OVH_MASTER_IPV4,
+            relayPort = 51821,
+            tunnelSubnetIndex = 1,
             baseLatencyMs = 34,
             loadPercent = 16,
             bandwidthGbps = 20
@@ -249,7 +259,9 @@ object GlobalServersCatalog {
             flagEmoji = "🇨🇲",
             region = ServerRegion.MEA,
             virtualIpPrefix = "154.72.172",
-            endpointHost = "yao01.africa.zprivate.net",
+            endpointHost = OVH_MASTER_IPV4,
+            relayPort = 51822,
+            tunnelSubnetIndex = 2,
             baseLatencyMs = 39,
             loadPercent = 14,
             bandwidthGbps = 20
@@ -262,7 +274,9 @@ object GlobalServersCatalog {
             flagEmoji = "🇨🇭",
             region = ServerRegion.EUROPE,
             virtualIpPrefix = "194.42.110",
-            endpointHost = "zur01.privacy.zprivate.net",
+            endpointHost = OVH_MASTER_IPV4,
+            relayPort = 51823,
+            tunnelSubnetIndex = 3,
             baseLatencyMs = 16,
             loadPercent = 18,
             bandwidthGbps = 40
@@ -275,7 +289,9 @@ object GlobalServersCatalog {
             flagEmoji = "🇩🇪",
             region = ServerRegion.EUROPE,
             virtualIpPrefix = "89.163.220",
-            endpointHost = "fra01.edge.zprivate.net",
+            endpointHost = OVH_MASTER_IPV4,
+            relayPort = 51824,
+            tunnelSubnetIndex = 4,
             baseLatencyMs = 18,
             loadPercent = 31,
             bandwidthGbps = 40
@@ -288,7 +304,9 @@ object GlobalServersCatalog {
             flagEmoji = "🇳🇱",
             region = ServerRegion.EUROPE,
             virtualIpPrefix = "146.70.88",
-            endpointHost = "ams01.edge.zprivate.net",
+            endpointHost = OVH_MASTER_IPV4,
+            relayPort = 51825,
+            tunnelSubnetIndex = 5,
             baseLatencyMs = 19,
             loadPercent = 29,
             bandwidthGbps = 20
@@ -301,7 +319,9 @@ object GlobalServersCatalog {
             flagEmoji = "🇬🇧",
             region = ServerRegion.EUROPE,
             virtualIpPrefix = "212.102.51",
-            endpointHost = "lon01.edge.zprivate.net",
+            endpointHost = OVH_MASTER_IPV4,
+            relayPort = 51826,
+            tunnelSubnetIndex = 6,
             baseLatencyMs = 21,
             loadPercent = 35,
             bandwidthGbps = 20
@@ -314,7 +334,9 @@ object GlobalServersCatalog {
             flagEmoji = "🇮🇸",
             region = ServerRegion.EUROPE,
             virtualIpPrefix = "37.235.49",
-            endpointHost = "rek01.bunker.zprivate.net",
+            endpointHost = OVH_MASTER_IPV4,
+            relayPort = 51827,
+            tunnelSubnetIndex = 7,
             baseLatencyMs = 38,
             loadPercent = 12,
             bandwidthGbps = 10
@@ -327,7 +349,9 @@ object GlobalServersCatalog {
             flagEmoji = "🇺🇸",
             region = ServerRegion.AMERICAS,
             virtualIpPrefix = "64.44.102",
-            endpointHost = "nyc01.edge.zprivate.net",
+            endpointHost = OVH_MASTER_IPV4,
+            relayPort = 51828,
+            tunnelSubnetIndex = 8,
             baseLatencyMs = 68,
             loadPercent = 41,
             bandwidthGbps = 40
@@ -340,7 +364,9 @@ object GlobalServersCatalog {
             flagEmoji = "🇺🇸",
             region = ServerRegion.AMERICAS,
             virtualIpPrefix = "104.28.14",
-            endpointHost = "sjc01.edge.zprivate.net",
+            endpointHost = OVH_MASTER_IPV4,
+            relayPort = 51829,
+            tunnelSubnetIndex = 9,
             baseLatencyMs = 118,
             loadPercent = 33,
             bandwidthGbps = 40
@@ -353,7 +379,9 @@ object GlobalServersCatalog {
             flagEmoji = "🇨🇦",
             region = ServerRegion.AMERICAS,
             virtualIpPrefix = "192.99.180",
-            endpointHost = "mtl01.edge.zprivate.net",
+            endpointHost = OVH_MASTER_IPV4,
+            relayPort = 51830,
+            tunnelSubnetIndex = 10,
             baseLatencyMs = 74,
             loadPercent = 22,
             bandwidthGbps = 20
@@ -366,7 +394,9 @@ object GlobalServersCatalog {
             flagEmoji = "🇧🇷",
             region = ServerRegion.AMERICAS,
             virtualIpPrefix = "177.54.144",
-            endpointHost = "gru01.edge.zprivate.net",
+            endpointHost = OVH_MASTER_IPV4,
+            relayPort = 51831,
+            tunnelSubnetIndex = 11,
             baseLatencyMs = 136,
             loadPercent = 27,
             bandwidthGbps = 10
@@ -379,7 +409,9 @@ object GlobalServersCatalog {
             flagEmoji = "🇯🇵",
             region = ServerRegion.ASIA_PACIFIC,
             virtualIpPrefix = "103.114.190",
-            endpointHost = "tyo01.edge.zprivate.net",
+            endpointHost = OVH_MASTER_IPV4,
+            relayPort = 51832,
+            tunnelSubnetIndex = 12,
             baseLatencyMs = 152,
             loadPercent = 30,
             bandwidthGbps = 40
@@ -392,7 +424,9 @@ object GlobalServersCatalog {
             flagEmoji = "🇸🇬",
             region = ServerRegion.ASIA_PACIFIC,
             virtualIpPrefix = "138.199.21",
-            endpointHost = "sin01.edge.zprivate.net",
+            endpointHost = OVH_MASTER_IPV4,
+            relayPort = 51833,
+            tunnelSubnetIndex = 13,
             baseLatencyMs = 144,
             loadPercent = 26,
             bandwidthGbps = 40
@@ -405,7 +439,9 @@ object GlobalServersCatalog {
             flagEmoji = "🇰🇷",
             region = ServerRegion.ASIA_PACIFIC,
             virtualIpPrefix = "121.78.90",
-            endpointHost = "sel01.edge.zprivate.net",
+            endpointHost = OVH_MASTER_IPV4,
+            relayPort = 51834,
+            tunnelSubnetIndex = 14,
             baseLatencyMs = 159,
             loadPercent = 19,
             bandwidthGbps = 20
@@ -418,7 +454,9 @@ object GlobalServersCatalog {
             flagEmoji = "🇦🇺",
             region = ServerRegion.ASIA_PACIFIC,
             virtualIpPrefix = "45.121.209",
-            endpointHost = "syd01.edge.zprivate.net",
+            endpointHost = OVH_MASTER_IPV4,
+            relayPort = 51835,
+            tunnelSubnetIndex = 15,
             baseLatencyMs = 178,
             loadPercent = 21,
             bandwidthGbps = 20
@@ -431,7 +469,9 @@ object GlobalServersCatalog {
             flagEmoji = "🇦🇪",
             region = ServerRegion.MEA,
             virtualIpPrefix = "185.193.36",
-            endpointHost = "dxb01.edge.zprivate.net",
+            endpointHost = OVH_MASTER_IPV4,
+            relayPort = 51836,
+            tunnelSubnetIndex = 16,
             baseLatencyMs = 89,
             loadPercent = 25,
             bandwidthGbps = 10
@@ -444,7 +484,9 @@ object GlobalServersCatalog {
             flagEmoji = "🇿🇦",
             region = ServerRegion.MEA,
             virtualIpPrefix = "196.240.54",
-            endpointHost = "jnb01.edge.zprivate.net",
+            endpointHost = OVH_MASTER_IPV4,
+            relayPort = 51837,
+            tunnelSubnetIndex = 17,
             baseLatencyMs = 148,
             loadPercent = 15,
             bandwidthGbps = 10
