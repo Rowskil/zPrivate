@@ -529,7 +529,7 @@ private fun OneClickShieldOrb(
             }
 
             Surface(
-                modifier = Modifier.size(156.dp),
+                modifier = Modifier.size(164.dp),
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.surface,
                 border = BorderStroke(2.5.dp, orbColor),
@@ -548,8 +548,11 @@ private fun OneClickShieldOrb(
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        ZPrivateLogoVector(size = 54.dp)
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    ) {
+                        ZPrivateLogoVector(size = 50.dp)
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
                             text = when (connectionState) {
@@ -567,9 +570,12 @@ private fun OneClickShieldOrb(
                                     AppLanguage.ES -> "CONECTAR"
                                 }
                             },
-                            style = MaterialTheme.typography.labelLarge,
+                            style = MaterialTheme.typography.labelLarge.copy(letterSpacing = 0.5.sp),
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            softWrap = false,
+                            textAlign = TextAlign.Center
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
@@ -580,7 +586,11 @@ private fun OneClickShieldOrb(
                             },
                             style = MaterialTheme.typography.labelMedium,
                             fontFamily = JetBrainsMono,
-                            color = orbColor
+                            color = orbColor,
+                            maxLines = 1,
+                            softWrap = false,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center
                         )
                     }
                 }
@@ -714,16 +724,22 @@ private fun ActiveServerCard(
                         }
                     }
                     Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
                             Text(
                                 text = "${srv.city}, ${srv.country}",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f, fill = false)
                             )
                             if (uiState.smartFastestRouting) {
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
                                 Surface(
                                     shape = CircleShape,
                                     color = accentColor.copy(alpha = 0.18f)
@@ -732,6 +748,7 @@ private fun ActiveServerCard(
                                         text = "Auto",
                                         style = MaterialTheme.typography.labelSmall,
                                         color = accentColor,
+                                        softWrap = false,
                                         modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
                                     )
                                 }
@@ -745,11 +762,14 @@ private fun ActiveServerCard(
                                 AppLanguage.ES -> "Toca para cambiar de servidor"
                             },
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
 
+                Spacer(modifier = Modifier.width(8.dp))
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = null,

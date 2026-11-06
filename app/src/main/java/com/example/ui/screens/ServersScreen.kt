@@ -390,12 +390,14 @@ fun ServersScreen(
                                 }
                             }
                             Spacer(modifier = Modifier.width(14.dp))
-                            Column {
+                            Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = group.country,
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1,
+                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                                 )
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
@@ -405,7 +407,9 @@ fun ServersScreen(
                                         group.servers.first().city
                                     },
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                                 )
                             }
                         }
@@ -482,20 +486,33 @@ fun ServersScreen(
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.weight(1f, fill = false)
+                                        ) {
                                             Text(
                                                 text = srv.city,
                                                 style = MaterialTheme.typography.titleSmall,
                                                 fontWeight = if (isCitySelected) FontWeight.Bold else FontWeight.Medium,
-                                                color = MaterialTheme.colorScheme.onSurface
+                                                color = MaterialTheme.colorScheme.onSurface,
+                                                maxLines = 1,
+                                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                                             )
                                             if (isCitySelected) {
                                                 Spacer(modifier = Modifier.width(8.dp))
-                                                Text(
-                                                    text = "• Connecté",
-                                                    style = MaterialTheme.typography.labelSmall,
-                                                    color = ProtectedEmerald
-                                                )
+                                                Surface(
+                                                    shape = CircleShape,
+                                                    color = ProtectedEmerald.copy(alpha = 0.16f)
+                                                ) {
+                                                    Text(
+                                                        text = "Connecté",
+                                                        style = MaterialTheme.typography.labelSmall,
+                                                        color = ProtectedEmerald,
+                                                        fontWeight = FontWeight.Bold,
+                                                        softWrap = false,
+                                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                                                    )
+                                                }
                                             }
                                         }
 

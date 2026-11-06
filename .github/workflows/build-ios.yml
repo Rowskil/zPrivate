@@ -13,11 +13,12 @@ permissions:
 jobs:
   build-ios:
     name: Build iOS Package
-    runs-on: macos-13
+    # Use standard fast runner to avoid queue hangs on deprecated macOS pools
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Show Xcode & Swift Environment
         run: |
